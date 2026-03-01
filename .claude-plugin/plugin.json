@@ -1,0 +1,13 @@
+{
+  "name": "car-sales-suite",
+  "version": "1.0.0",
+  "description": "Complete AI sales suite for car dealerships. Includes lead management, outreach automation, conquest lead sourcing, and buyer lead generation. All three skills feed one unified pipeline. Install once per associate — runs entirely inside Claude, no API key or external app needed.",
+  "author": {
+    "name": "nmdzaza",
+    "email": "camjohn816@gmail.com"
+  },
+  "keywords": ["dealership", "car sales", "automotive", "lead management", "crm", "outreach", "conquest", "buyer leads"],
+  "skills": ["dealer-onboarding", "car-sales", "conquest-leads", "buyer-leads"],
+  "requires_setup": true,
+  "setup_skill": "dealer-onboarding"
+}
