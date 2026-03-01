@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Sales Suite — Claude Plugin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2230;
+      --border: #30363d;
+      --accent: #f78166;
+      --accent2: #79c0ff;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --green: #3fb950;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 1.05rem; color: var(--text); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 0.9rem; color: var(--muted); }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(247,129,102,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(247,129,102,0.4);
+      border-radius: 999px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, #e6edf3 0%, #79c0ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.6rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); text-decoration: none; }
+    .btn-primary { background: var(--accent); color: #0d1117; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── INSTALL STRIP ── */
+    .install-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 700px;
+      margin: 0 auto 5rem;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .install-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.3rem; }
+    .install-cmd {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.92rem;
+      color: var(--green);
+    }
+    .copy-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: #2d333b; color: var(--text); }
+
+    /* ── SKILLS GRID ── */
+    .section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .section h2 {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 3rem;
+      font-size: 1rem;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+    .card-icon { font-size: 1.75rem; margin-bottom: 0.85rem; }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent2);
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+    .card p { font-size: 0.9rem; color: var(--muted); }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; counter-reset: steps; }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+      counter-increment: steps;
+    }
+    .step::before {
+      content: counter(steps);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: rgba(247,129,102,0.15);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.88rem; color: var(--muted); }
+
+    /* ── REQUIREMENTS ── */
+    .req-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+    .req-list li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .req-list li .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .optional .dot { background: var(--muted); }
+
+    /* ── CTA BLOCK ── */
+    .cta-block {
+      background: linear-gradient(135deg, #161b22 0%, #1c2230 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      padding: 4rem 2rem;
+      margin: 4rem auto;
+      max-width: 700px;
+    }
+    .cta-block h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-block p { color: var(--muted); margin-bottom: 2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.2rem; }
+      .hero { padding: 4rem 1.2rem 2.5rem; }
+      .install-strip { padding: 1rem; }
+      .section { padding: 3rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">&#x1F697; Car Sales Suite</span>
+  <div class="nav-links">
+    <a href="#skills">Skills</a>
+    <a href="#install">Install</a>
+    <a href="#requirements">Requirements</a>
+    <a href="https://github.com/nmdzaza/car-sales-suite">GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">Claude Plugin</div>
+  <h1>AI Sales System for Car Dealerships</h1>
+  <p>A complete AI-powered sales toolkit that runs entirely inside Claude Desktop. No separate app, no CRM subscription, no setup complexity.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="https://github.com/nmdzaza/car-sales-suite/releases/latest">&#x2B07; Download Plugin</a>
+    <a class="btn btn-secondary" href="https://github.com/nmdzaza/car-sales-suite">View on GitHub</a>
+  </div>
+</section>
+
+<!-- INSTALL STRIP -->
+<div class="install-strip" style="max-width:700px;margin:0 auto 5rem;">
+  <div>
+    <div class="install-label">One-command install (Claude Code)</div>
+    <div class="install-cmd">/plugin install car-sales-suite@claude-plugin-directory</div>
+  </div>
+  <button class="copy-btn" onclick="navigator.clipboard.writeText('/plugin install car-sales-suite@claude-plugin-directory').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
+</div>
+
+<!-- SKILLS -->
+<section class="section" id="skills">
+  <div class="section-label">What's Inside</div>
+  <h2>4 Powerful Skills</h2>
+  <p class="section-sub">Each skill is a focused AI workflow built for a specific part of the car sales process.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-icon">&#x1F4CB;</div>
+      <h3>dealer-onboarding</h3>
+      <p>One-time setup that saves your profile so every future session is pre-personalized with your dealership details.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#x1F4AC;</div>
+      <h3>car-sales</h3>
+      <p>Works paid, warm, and dead leads. Builds outreach sequences, logs your pipeline, and sends iMessages directly.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#x1F50D;</div>
+      <h3>buyer-leads</h3>
+      <p>Finds people actively looking to buy by scanning Reddit, Facebook, Craigslist, and Twitter in real time.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#x1F3AF;</div>
+      <h3>conquest-leads</h3>
+      <p>Identifies private sellers you can flip into trade-in and upgrade deals — turning competitors into customers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="install">
+  <div class="section-label">How It Works</div>
+  <h2>Up and Running in Minutes</h2>
+  <p class="section-sub">Install once, then just talk to Claude. Your profile is remembered across every session.</p>
+  <div class="steps">
+    <div class="step">
+      <h3>Install the Plugin</h3>
+      <p>Use the one-command install in Claude Code, or manually clone the repo and copy it into your plugins folder.</p>
+    </div>
+    <div class="step">
+      <h3>Run Onboarding</h3>
+      <p>Claude automatically starts <code style="color:var(--accent2)">dealer-onboarding</code> and asks 8 quick questions to personalize your experience.</p>
+    </div>
+    <div class="step">
+      <h3>Find Leads</h3>
+      <p>Activate <code style="color:var(--accent2)">buyer-leads</code> or <code style="color:var(--accent2)">conquest-leads</code> to surface hot prospects from social and classifieds.</p>
+    </div>
+    <div class="step">
+      <h3>Close Deals</h3>
+      <p>Let <code style="color:var(--accent2)">car-sales</code> build personalized outreach, track your pipeline, and fire off iMessages automatically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- REQUIREMENTS -->
+<section class="section" id="requirements">
+  <div class="section-label">Requirements</div>
+  <h2>What You Need</h2>
+  <p class="section-sub">A minimal setup — you likely have most of this already.</p>
+  <ul class="req-list">
+    <li><span class="dot"></span>Claude Desktop (Pro or Max)</li>
+    <li><span class="dot"></span>Mac (for iMessage via MCP)</li>
+    <li><span class="dot"></span>Desktop Commander MCP</li>
+    <li class="optional"><span class="dot"></span>Gmail MCP (optional)</li>
+  </ul>
+</section>
+
+<!-- CTA -->
+<div class="cta-block" style="padding:4rem 2rem;margin:2rem auto 4rem;">
+  <h2>Ready to Sell Smarter?</h2>
+  <p>Download the plugin and start working leads with AI in under 5 minutes.</p>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+    <a class="btn btn-primary" href="https://github.com/nmdzaza/car-sales-suite/releases/latest">&#x2B07; Download v1.0.0</a>
+    <a class="btn btn-secondary" href="mailto:camjohn816@gmail.com">Contact for Licensing</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>&#x1F697; Car Sales Suite &mdash; a <a href="https://github.com/nmdzaza/car-sales-suite">Claude Plugin</a> by <a href="https://github.com/nmdzaza">NMD ZAZA</a></p>
+  <p style="margin-top:0.5rem;">For dealership licensing &amp; lead packages: <a href="mailto:camjohn816@gmail.com">camjohn816@gmail.com</a></p>
+</footer>
+
+</body>
+</html>
